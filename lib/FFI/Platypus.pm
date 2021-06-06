@@ -6,7 +6,6 @@ use 5.008004;
 use Carp qw( croak );
 use FFI::Platypus::Function;
 use FFI::Platypus::Type;
-
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
 # VERSION
 

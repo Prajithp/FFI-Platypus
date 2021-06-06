@@ -16,6 +16,40 @@ void ffi_pl_complex_float_to_perl(SV *sv, float *ptr);
 void ffi_pl_perl_to_complex_double(SV *sv, double *ptr);
 void ffi_pl_complex_double_to_perl(SV *sv, double *ptr);
 
+
+PerlInterpreter *parent_perl;
+extern PerlInterpreter *parent_perl;
+PerlInterpreter *current_perl;
+
+#ifdef PERL_IMPLICIT_CONTEXT
+#define PERL_THREAD_CONTEXT aTHX
+#else
+#define PERL_THREAD_CONTEXT NULL
+#endif
+
+#define GET_PERL_CONTEXT \
+    eval_pv("require DynaLoader;", TRUE); \
+    if(!current_perl) { \
+       parent_perl = PERL_GET_CONTEXT; \
+       if (parent_perl) { \
+          if (PERL_THREAD_CONTEXT == NULL) { \
+             current_perl = perl_clone(parent_perl, CLONEf_KEEP_PTR_TABLE | CLONEf_COPY_STACKS); \
+          } else { \
+             current_perl = PERL_THREAD_CONTEXT; \
+          } \
+          PERL_SET_CONTEXT(parent_perl); \
+       } \
+    }
+
+
+#define ENTER_PERL_CONTEXT { \
+    if(!PERL_GET_CONTEXT) { \
+        PERL_SET_CONTEXT( current_perl ); \
+    }
+
+#define LEAVE_PERL_CONTEXT }
+
+
 #define ffi_pl_perl_to_long_double(sv, ptr)                           \
   if(!SvOK(sv))                                                       \
   {                                                                   \

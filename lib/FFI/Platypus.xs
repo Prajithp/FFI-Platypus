@@ -71,6 +71,7 @@ BOOT:
   MY_CXT.loaded_math_longdouble = 0;
   MY_CXT.custom_keepers         = get_av("FFI::Platypus::keep", GV_ADD);
   PERL_MATH_INT64_LOAD_OR_CROAK;
+  GET_PERL_CONTEXT;
 
   stash = gv_stashpv("FFI::Platypus", TRUE);
   newCONSTSUB(stash, "_cast0", newSVuv(PTR2UV(cast0)));

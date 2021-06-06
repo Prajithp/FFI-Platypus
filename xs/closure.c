@@ -53,6 +53,7 @@ ffi_pl_closure_get_data(SV *closure, ffi_pl_type *type)
 void
 ffi_pl_closure_call(ffi_cif *ffi_cif, void *result, void **arguments, void *user)
 {
+  ENTER_PERL_CONTEXT;
   dSP;
 
   ffi_pl_closure *closure = (ffi_pl_closure*) user;
@@ -298,5 +299,6 @@ ffi_pl_closure_call(ffi_cif *ffi_cif, void *result, void **arguments, void *user
     FREETMPS;
     LEAVE;
   }
+  LEAVE_PERL_CONTEXT;
 }
 
