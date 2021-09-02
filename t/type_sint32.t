@@ -3,9 +3,7 @@
 # This file generated from similar file t/type_sint8.t
 # all instances of "int8" have been changed to "int32"
 #
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use FFI::Platypus;
 use FFI::CheckLib;
 
@@ -38,6 +36,12 @@ foreach my $api (0, 1, 2)
     $ffi->attach( [sint32_static_array => 'static_array'] => [] => 'sint32_a');
     $ffi->attach( [pointer_null => 'null2'] => [] => 'sint32_a');
 
+    if($api >= 2)
+    {
+      $ffi->attach( [sint32_sum => 'sum3'] => ['sint32*'] => 'sint32' );
+      $ffi->attach( [sint32_array_inc => 'array_inc2'] => ['sint32*'] => 'void');
+    }
+
     is add(-1,2), 1, 'add(-1,2) = 1';
     is do { no warnings; add() }, 0, 'add() = 0';
 
@@ -53,19 +57,31 @@ foreach my $api (0, 1, 2)
     is sum(\@list), -5, 'sum([-5..4]) = -5';
     is sum2(\@list,scalar @list), -5, 'sum([-5..4],10) = -5';
 
+    if($api >= 2)
+    {
+      is(sum3(\@list), -5, 'sum([-5..4]) = -5 (passed as pointer)');
+    }
+
     array_inc(\@list);
     do { local $SIG{__WARN__} = sub {}; array_inc() };
 
-    is_deeply \@list, [-4,-3,-2,-1,0,1,2,3,4,5], 'array increment';
+    is \@list, [-4,-3,-2,-1,0,1,2,3,4,5], 'array increment';
 
-    is_deeply [null()], [$api >= 2 ? (undef) : ()], 'null() == undef';
+    if($api >= 2)
+    {
+      @list = (-5,-4,-3,-2,-1,0,1,2,3,4);
+      array_inc2(\@list);
+      is \@list, [-4,-3,-2,-1,0,1,2,3,4,5], 'array increment';
+    }
+
+    is [null()], [$api >= 2 ? (undef) : ()], 'null() == undef';
     is is_null(undef), 1, 'is_null(undef) == 1';
     is is_null(), 1, 'is_null() == 1';
     is is_null(\22), 0, 'is_null(22) == 0';
 
-    is_deeply static_array(), [-1,2,-3,4,-5,6,-7,8,-9,10], 'static_array = [-1,2,-3,4,-5,6,-7,8,-9,10]';
+    is static_array(), [-1,2,-3,4,-5,6,-7,8,-9,10], 'static_array = [-1,2,-3,4,-5,6,-7,8,-9,10]';
 
-    is_deeply [null2()], [$api >= 2 ? (undef) : ()], 'null2() == undef';
+    is [null2()], [$api >= 2 ? (undef) : ()], 'null2() == undef';
 
     my $closure = $ffi->closure(sub { $_[0]-2 });
     $ffi->attach( [sint32_set_closure => 'set_closure'] => ['sint32_c'] => 'void');

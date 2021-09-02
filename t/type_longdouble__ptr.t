@@ -1,13 +1,11 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use FFI::Platypus;
 use FFI::Platypus::TypeParser;
 use FFI::CheckLib;
 use Config;
 
 BEGIN {
-  plan skip_all => 'test requires support for long double'
+  skip_all 'test requires support for long double'
     unless FFI::Platypus::TypeParser->have_type('longdouble');
 }
 

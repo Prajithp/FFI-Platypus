@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use FFI::Platypus;
 use FFI::CheckLib;
 use FFI::Platypus::ShareConfig;
@@ -96,12 +94,12 @@ subtest 'records' => sub {
             ->call( ["Graham", 47] ),
         47,
       );
-      is_deeply(
+      is(
         $ffi->function( foo_create => ['string','sint32'] => 'foo_t' )
             ->call("Adams", 42),
         ["Adams\0\0\0\0\0\0\0\0\0\0\0", 42],
       );
-      is_deeply(
+      is(
         $ffi->function( pointer_null => [] => 'foo_t' )
             ->call,
         [],
@@ -144,10 +142,10 @@ subtest 'records' => sub {
         47,
       );
       subtest 'return-value' => sub {
-        plan skip_all => 'test requires working return records-by-value'
+        skip_all 'test requires working return records-by-value'
         unless $return_ok;
 
-        is_deeply(
+        is(
           $ffi->function( foo_value_create => ['string','sint32'] => 'foo_t' )
               ->call("Adams", 42),
          ["Adams\0\0\0\0\0\0\0\0\0\0\0", 42],

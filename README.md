@@ -1,4 +1,4 @@
-# FFI::Platypus [![Build Status](https://api.cirrus-ci.com/github/PerlFFI/FFI-Platypus.svg)](https://cirrus-ci.com/github/PerlFFI/FFI-Platypus) [![Build Status](https://api.travis-ci.com/PerlFFI/FFI-Platypus.svg?branch=main)](https://travis-ci.com/github/PerlFFI/FFI-Platypus) ![linux](https://github.com/PerlFFI/FFI-Platypus/workflows/linux/badge.svg) ![windows](https://github.com/PerlFFI/FFI-Platypus/workflows/windows/badge.svg) ![macos](https://github.com/PerlFFI/FFI-Platypus/workflows/macos/badge.svg) ![cygwin](https://github.com/PerlFFI/FFI-Platypus/workflows/cygwin/badge.svg) ![msys2-mingw](https://github.com/PerlFFI/FFI-Platypus/workflows/msys2-mingw/badge.svg)
+# FFI::Platypus [![Build Status](https://api.cirrus-ci.com/github/PerlFFI/FFI-Platypus.svg)](https://cirrus-ci.com/github/PerlFFI/FFI-Platypus) ![static](https://github.com/PerlFFI/FFI-Platypus/workflows/static/badge.svg) ![linux](https://github.com/PerlFFI/FFI-Platypus/workflows/linux/badge.svg) ![windows](https://github.com/PerlFFI/FFI-Platypus/workflows/windows/badge.svg) ![macos](https://github.com/PerlFFI/FFI-Platypus/workflows/macos/badge.svg) ![cygwin](https://github.com/PerlFFI/FFI-Platypus/workflows/cygwin/badge.svg) ![msys2-mingw](https://github.com/PerlFFI/FFI-Platypus/workflows/msys2-mingw/badge.svg)
 
 Write Perl bindings to non-Perl libraries with FFI. No XS required.
 
@@ -47,9 +47,9 @@ to write an extension with Platypus instead of XS:
     common interface specifications to a common format like JSON that could
     be shared between different languages.
 
-- FFI / Platypus could be a bridge to Perl 6
+- FFI / Platypus could be a bridge to Raku
 
-    One of those "other" languages could be Perl 6 and Perl 6 already has an
+    One of those "other" languages could be Raku and Raku already has an
     FFI interface I am told.
 
 - FFI / Platypus can be reimplemented
@@ -130,6 +130,8 @@ the [lib](#lib) attribute.
 
 - api
 
+    \[version 0.91\]
+
     Sets the API level.  Legal values are
 
     - `0`
@@ -145,6 +147,23 @@ the [lib](#lib) attribute.
 
         All new code should be written with this set to 1!  The Platypus documentation
         assumes this api level is set.
+
+    - `2`
+
+        Enable version 2 API, which is currently experimental.  Using API level 2 prior
+        to Platypus version 2.00 will trigger a (noisy) warning.
+
+        API version 2 is identical to version 1, except:
+
+        - Pointer functions that return `NULL` will return `undef` instead of empty list
+
+            This fixes a long standing design bug in Platypus.
+
+        - Array references may be passed to pointer argument types
+
+            This replicates the behavior of array argument types with no size.  So the types `sint8*` and `sint8[]`
+            behave identically when an array reference is passed in.  They differ in that, as before, you can
+            pass a scalar reference into type `sint8*`.
 
 - lib
 
@@ -900,7 +919,7 @@ package Unix::TimeStruct {
   });
 }
 
-# now we can actually use our My::UnixTime class
+# now we can actually use our Unix::TimeStruct class
 my $time = Unix::TimeStruct->localtime;
 printf "time is %d:%d:%d %s\n",
   $time->tm_hour,
@@ -1832,7 +1851,7 @@ the development package for `libffi` as prereqs for this module.
 
 - [NativeCall](https://metacpan.org/pod/NativeCall)
 
-    Promising interface to Platypus inspired by Perl 6.
+    Promising interface to Platypus inspired by Raku.
 
 - [FFI::Platypus::Type](https://metacpan.org/pod/FFI::Platypus::Type)
 
@@ -1996,7 +2015,7 @@ Damyan Ivanov
 
 Ilya Pavlov (Ilya33)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Mohammad S Anwar (MANWAR)
 
@@ -2009,6 +2028,10 @@ Diab Jerius (DJERIUS)
 Eric Brine (IKEGAMI)
 
 szTheory
+
+José Joaquín Atria (JJATRIA)
+
+Pete Houston (openstrike, HOUSTON)
 
 # COPYRIGHT AND LICENSE
 

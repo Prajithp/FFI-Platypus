@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use FFI::CheckLib;
 use FFI::Platypus;
 use File::Spec;
@@ -14,7 +12,7 @@ BEGIN
     last if -f $path;
   }
 
-  plan skip_all => 'Test requires forks' unless defined $path && -f $path;
+  skip_all 'Test requires forks' unless defined $path && -f $path;
 }
 
 use forks;
@@ -32,6 +30,8 @@ sub otherthread
   undef $ffi;
   $val;
 }
+
+ok 1;
 
 is(threads->create(\&otherthread)->join(), 22, 'works in a thread');
 

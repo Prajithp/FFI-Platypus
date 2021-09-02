@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use lib 't/lib';
 use Test::Cleanup;
 use Test::Platypus;
@@ -32,13 +30,13 @@ subtest 'basic' => sub {
 subtest 'file classes' => sub {
   {
     package FFI::Build::File::Foo1;
-    use base qw( FFI::Build::File::Base );
+    use parent qw( FFI::Build::File::Base );
     $INC{'FFI/Build/File/Foo1.pm'} = __FILE__;
   }
 
   {
     package FFI::Build::File::Foo2;
-    use base qw( FFI::Build::File::Base );
+    use parent qw( FFI::Build::File::Base );
   }
 
   my @list = FFI::Build::_file_classes();
@@ -124,7 +122,7 @@ subtest 'build' => sub {
 
 subtest 'build c++' => sub {
 
-  plan skip_all => 'Test requires C++ compiler'
+  skip_all 'Test requires C++ compiler'
     unless eval { FFI::Build::Platform->which(FFI::Build::Platform->cxx) };
 
   my $tempdir = FFI::Temp->newdir( TEMPLATE => "tmpbuild.XXXXXX" );
@@ -199,7 +197,7 @@ subtest 'build c++' => sub {
 
 subtest 'alien' => sub {
 
-  plan skip_all => 'Test requires Acme::Alien::DontPanic 1.03'
+  skip_all 'Test requires Acme::Alien::DontPanic 1.03'
     unless eval { require Acme::Alien::DontPanic; Acme::Alien::DontPanic->VERSION("1.03") };
 
 

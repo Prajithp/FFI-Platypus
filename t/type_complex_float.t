@@ -1,17 +1,15 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use FFI::Platypus;
 use FFI::Platypus::TypeParser;
 use FFI::CheckLib;
 use Data::Dumper qw( Dumper );
 
 BEGIN {
-  plan skip_all => 'Test requires support for float complex'
+  skip_all 'Test requires support for float complex'
     unless FFI::Platypus::TypeParser->have_type('complex_float');
 }
 
-foreach my $api (0, 1)
+foreach my $api (0, 1, 2)
 {
 
   subtest "api = $api" => sub {
@@ -22,7 +20,7 @@ foreach my $api (0, 1)
       warn $message;
     };
 
-    my $ffi = FFI::Platypus->new( api => $api );
+    my $ffi = FFI::Platypus->new( api => $api, experimental => ($api >=2 ? $api : undef) );
     $ffi->lib(find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi');
 
     $ffi->attach(['complex_float_get_real' => 'creal'] => ['complex_float'] => 'float');
@@ -43,7 +41,7 @@ foreach my $api (0, 1)
       };
 
       subtest 'with Math::Complex' => sub {
-        plan skip_all => 'test requires Math::Complex'
+        skip_all 'test requires Math::Complex'
           unless eval q{ use Math::Complex (); 1 };
         my $c = Math::Complex->make(10.5, 20.5);
         note "to_string(\$c) = ", to_string($c);
@@ -70,7 +68,7 @@ foreach my $api (0, 1)
       };
 
       subtest 'with Math::Complex' => sub {
-        plan skip_all => 'test requires Math::Complex'
+        skip_all 'test requires Math::Complex'
           unless eval q{ use Math::Complex (); 1 };
         my $c = Math::Complex->make(10.5, 20.5);
         note "to_string(\$c) = ", to_string($c);
@@ -81,21 +79,21 @@ foreach my $api (0, 1)
       subtest 'values set on out (array)' => sub {
         my @c;
         complex_set(\\@c, 1.0, 2.0);
-        is_deeply \@c, [ 1.0, 2.0 ];
+        is \@c, [ 1.0, 2.0 ];
       };
 
       subtest 'values set on out (object)' => sub {
-        plan skip_all => 'test requires Math::Complex'
+        skip_all 'test requires Math::Complex'
           unless eval q{ use Math::Complex (); 1 };
         my $c = Math::Complex->make(0.0, 0.0);
         complex_set(\$c, 1.0, 2.0);
-        is_deeply( [ $c->Re, $c->Im ], [1.0,2.0] );
+        is( [ $c->Re, $c->Im ], [1.0,2.0] );
       };
 
       subtest 'values set on out (other)' => sub {
         my $c;
         complex_set(\$c, 1.0, 2.0);
-        is_deeply( $c, [1.0, 2.0]);
+        is( $c, [1.0, 2.0]);
       };
 
     };
@@ -106,9 +104,9 @@ foreach my $api (0, 1)
 
     subtest 'return value' => sub {
 
-      is_deeply(complex_ret(1.0,2.0),       [1.0,2.0], 'standard');
-      is_deeply(complex_ptr_ret(1.0,2.0),  \[1.0,2.0], 'pointer');
-      is_deeply([complex_null()],             [],     'null');
+      is(complex_ret(1.0,2.0),       [1.0,2.0], 'standard');
+      is(complex_ptr_ret(1.0,2.0),  \[1.0,2.0], 'pointer');
+      is([complex_null()],             $api >= 2 ? [undef] : [],     'null');
 
     };
 
@@ -118,11 +116,28 @@ foreach my $api (0, 1)
 
       my @a = ([0.0,0.0], [1.0,2.0], [3.0,4.0]);
       my $ret;
-      is_deeply( $ret = $f->call(\@a, 0), [0.0,0.0] )
+      is( $ret = $f->call(\@a, 0), [0.0,0.0] )
         or diag Dumper($ret);
-      is_deeply( $ret = $f->call(\@a, 1), [1.0,2.0] )
+      is( $ret = $f->call(\@a, 1), [1.0,2.0] )
         or diag Dumper($ret);
-      is_deeply( $ret = $f->call(\@a, 2), [3.0,4.0] )
+      is( $ret = $f->call(\@a, 2), [3.0,4.0] )
+        or diag Dumper($ret);
+
+    };
+
+    subtest 'complex array arg' => sub {
+
+      skip_all 'for api >= 2 only' unless $api >= 2;
+
+      my $f = $ffi->function(complex_float_array_get => ['complex_float*','int'] => 'complex_float' );
+
+      my @a = ([0.0,0.0], [1.0,2.0], [3.0,4.0]);
+      my $ret;
+      is( $ret = $f->call(\@a, 0), [0.0,0.0] )
+        or diag Dumper($ret);
+      is( $ret = $f->call(\@a, 1), [1.0,2.0] )
+        or diag Dumper($ret);
+      is( $ret = $f->call(\@a, 2), [3.0,4.0] )
         or diag Dumper($ret);
 
     };
@@ -133,7 +148,19 @@ foreach my $api (0, 1)
 
       my @a = ([0.0,0.0], [1.0,2.0], [3.0,4.0]);
       $f->call(\@a, 1, 5.0, 6.0);
-      is_deeply(\@a, [[0.0,0.0], [5.0,6.0], [3.0,4.0]]);
+      is(\@a, [[0.0,0.0], [5.0,6.0], [3.0,4.0]]);
+
+    };
+
+    subtest 'complex array arg set' => sub {
+
+      skip_all 'for api >= 2 only' unless $api >= 2;
+
+      my $f = $ffi->function(complex_float_array_set => ['complex_float*','int','float','float'] => 'void' );
+
+      my @a = ([0.0,0.0], [1.0,2.0], [3.0,4.0]);
+      $f->call(\@a, 1, 5.0, 6.0);
+      is(\@a, [[0.0,0.0], [5.0,6.0], [3.0,4.0]]);
 
     };
 
@@ -144,7 +171,7 @@ foreach my $api (0, 1)
       my @a = ([0.0,0.0], [1.0,2.0], [3.0,4.0]);
       my $ret;
 
-      is_deeply(
+      is(
         $ret = $f->call( \@a ),
         \@a,
       ) or diag Dumper($ret);
@@ -154,4 +181,3 @@ foreach my $api (0, 1)
 }
 
 done_testing;
-

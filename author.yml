@@ -117,7 +117,7 @@ pod_spelling_system:
     - fbx
     - strndup
     - Petr
-    - Pisar
+    - Písař
     - ppisar
     - Anwar
     - MANWAR
@@ -144,6 +144,11 @@ pod_spelling_system:
     - sensical
     - eXtensions
     - szTheory
+    - JJATRIA
+    - Joaqu
+    - Jos
+    - openstrike
+    - Raku
 
 pod_coverage:
   skip: 0

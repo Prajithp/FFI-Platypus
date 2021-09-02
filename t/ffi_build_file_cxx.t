@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use lib 't/lib';
 use Test::Cleanup;
 use FFI::Build::File::CXX;
@@ -8,7 +6,7 @@ use FFI::Build;
 use FFI::Build::Platform;
 use Capture::Tiny qw( capture_merged );
 
-plan skip_all => 'Test requires C++ compiler'
+skip_all 'Test requires C++ compiler'
   unless eval { FFI::Build::Platform->which(FFI::Build::Platform->cxx) };
 
 subtest 'basic' => sub {
@@ -29,7 +27,7 @@ subtest 'compile' => sub {
   my $object = $file->build_item;
   isa_ok $object, 'FFI::Build::File::Object';
 
-  is_deeply
+  is
     [ $object->build_item ],
     [];
 
